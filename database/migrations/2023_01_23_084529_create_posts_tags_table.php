@@ -15,10 +15,8 @@ return new class extends Migration
     {
       Schema::create('posts_tags', function (Blueprint $table) {
         $table->id();
-        $table->bigInteger('post_id');
-        $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
-        $table->bigInteger('tag_id');
-        $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+        $table->foreignId('post_id')->constrained()->onDelete('cascade');
+        $table->foreignId('tag_id')->constrained()->onDelete('cascade');
         $table->timestamps();
       });
     }
@@ -30,12 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-      Schema::table('posts_tags', function (Blueprint $table) {
-        $table->dropForeign(['post_id']);
-        $table->dropColumn('post_id');
-        $table->dropForeign(['tag_id']);
-        $table->dropColumn('tag_id');
-      });
       Schema::dropIfExists('posts_tags');
     }
 };
