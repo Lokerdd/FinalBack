@@ -13,6 +13,10 @@ class Tag extends Model
       'name'
     ];
 
+    protected $hidden = [
+      'pivot'
+    ];
+
     /**
      * The posts that belong to the Tag
      *
@@ -20,6 +24,6 @@ class Tag extends Model
      */
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class);
+        return $this->belongsToMany(Post::class, 'posts_tags');
     }
 }
