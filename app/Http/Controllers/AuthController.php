@@ -14,11 +14,13 @@ class AuthController extends Controller
   public function login(Request $request)
   {
     $validator = Validator::make($request->all(), [
-      'email' => ['required', 'email'],
+      'email' => ['required', 'email', 'exists:users'],
       'password' => ['required']
     ]);
     if ($validator->fails()) {
-      return response()->json($validator->getMessageBag());
+      return response()->json([
+        'message' => $validator->getMessageBag()
+      ], Response::HTTP_BAD_REQUEST);
     }
 
     if (Auth::attempt($request->only('email', 'password'))) {
@@ -36,9 +38,9 @@ class AuthController extends Controller
       ], Response::HTTP_OK);
     }
     
-    return back()->withErrors([
-      'email' => 'The provided credentials do not match our records.',
-    ]);
+    return response()->json([
+      'message' => 'The provided credentials do not match our records.',
+    ], Response::HTTP_BAD_REQUEST);
   }
 
   public function register(Request $request)
@@ -49,7 +51,9 @@ class AuthController extends Controller
       'password' => ['required', 'min:8']
     ]);
     if ($validator->fails()) {
-      return response()->json($validator->getMessageBag(), Response::HTTP_BAD_REQUEST);
+      return response()->json([
+        'message' => $validator->getMessageBag()
+      ], Response::HTTP_BAD_REQUEST);
     }
 
     $user = User::create(array_merge(
@@ -71,11 +75,23 @@ class AuthController extends Controller
     ], Response::HTTP_OK);
   }
 
-  function logout(Request $request) {
+  public function logout(Request $request) {
     Auth::logout();
 
     return response()->json([
       'message' => 'Successfully logged out'
     ], Response::HTTP_OK);
+  }
+
+  public function getUser() {
+    if (Auth::user()) {
+      return response()->json([
+        "user" => Auth::user()
+      ], Response::HTTP_OK);
+    }
+    return response()->json([
+      "message" => "You aren't authorized"
+    ], Response::HTTP_UNAUTHORIZED);
+
   }
 }
