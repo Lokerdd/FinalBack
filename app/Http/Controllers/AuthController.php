@@ -83,10 +83,10 @@ class AuthController extends Controller
     ], Response::HTTP_OK);
   }
 
-  public function getUser() {
-    if (Auth::user()) {
+  public function getUserByToken() {
+    if ($user = Auth::user()) {
       return response()->json([
-        "user" => Auth::user()
+        "user" => $user
       ], Response::HTTP_OK);
     }
     return response()->json([
