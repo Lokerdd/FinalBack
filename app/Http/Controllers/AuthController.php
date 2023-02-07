@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
+use Helpers\AuthHelper;
+
 class AuthController extends Controller
 {
   public function login(Request $request)
@@ -24,7 +26,7 @@ class AuthController extends Controller
     }
 
     if (Auth::attempt($request->only('email', 'password'))) {
-      return authenticate();
+      return AuthHelper::createToken();
     }
     
     return response()->json([
@@ -52,7 +54,7 @@ class AuthController extends Controller
     $user->save();
 
     Auth::attempt($request->only('email', 'password'));
-    return authenticate();
+    return AuthHelper::createToken();
   }
 
   public function logout(Request $request) {

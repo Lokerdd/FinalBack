@@ -1,11 +1,13 @@
 <?php
 
+namespace Helpers;
+
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
-if (! function_exists('authenticate')) {
-  function authenticate() {
+class AuthHelper {
+  public static function createToken() {
     $token = Auth::user()->createToken(config('app.name'));
     $token->accessToken->expires_at = Carbon::now()->addDay();
     $token->accessToken->save();
@@ -18,5 +20,5 @@ if (! function_exists('authenticate')) {
         Carbon::parse($token->accessToken->expires_at)
           ->toDateTimeString()
     ], Response::HTTP_OK);
-  };
-};
+  }
+}
