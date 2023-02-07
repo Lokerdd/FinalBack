@@ -9,6 +9,6 @@ class PostController extends Controller
 {
     public function index()
     {
-      return Post::with(['user:id,name,email', 'tags:name'])->get();
+      return Post::with(['user:id,name,email', 'tags:name'])->orderBy('id', 'desc')->get();
     }
 }

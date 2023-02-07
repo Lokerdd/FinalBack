@@ -11,6 +11,21 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+  private function authenticate() {
+    $token = Auth::user()->createToken(config('app.name'));
+    $token->accessToken->expires_at = Carbon::now()->addDay();
+    $token->accessToken->save();
+
+    return response()->json([
+      'user' => Auth::user(),
+      'token_type' => 'Bearer',
+      'token' => $token->accessToken,
+      'expires_at' => 
+        Carbon::parse($token->accessToken->expires_at)
+          ->toDateTimeString()
+    ], Response::HTTP_OK);
+  }
+
   public function login(Request $request)
   {
     $validator = Validator::make($request->all(), [
@@ -24,18 +39,7 @@ class AuthController extends Controller
     }
 
     if (Auth::attempt($request->only('email', 'password'))) {
-      $token = Auth::user()->createToken(config('app.name'));
-      $token->accessToken->expires_at = Carbon::now()->addDay();
-      $token->accessToken->save();
-
-      return response()->json([
-        'user' => Auth::user(),
-        'token_type' => 'Bearer',
-        'token' => $token->accessToken,
-        'expires_at' => 
-          Carbon::parse($token->accessToken->expires_at)
-            ->toDateTimeString()
-      ], Response::HTTP_OK);
+      return $this->authenticate();
     }
     
     return response()->json([
@@ -63,16 +67,7 @@ class AuthController extends Controller
     $user->save();
 
     Auth::attempt($request->only('email', 'password'));
-    $token = Auth::user()->createToken(config('app.name'));
-    $token->accessToken->expires_at = Carbon::now()->addDay();
-    $token->accessToken->save();
-
-    return response()->json([
-      'user' => Auth::user(),
-      'token_type' => 'Bearer',
-      'token' => $token->accessToken,
-      'expires_at' => Carbon::parse($token->accessToken->expires_at)->toDateTimeString()
-    ], Response::HTTP_OK);
+    return $this->authenticate();
   }
 
   public function logout(Request $request) {
