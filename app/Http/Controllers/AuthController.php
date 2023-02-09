@@ -30,7 +30,7 @@ class AuthController extends Controller
     }
     
     return response()->json([
-      'message' => 'The provided credentials do not match our records.',
+      'message' => ['email' => ['The provided credentials do not match our records.']],
     ], Response::HTTP_BAD_REQUEST);
   }
 
@@ -65,7 +65,7 @@ class AuthController extends Controller
     ], Response::HTTP_OK);
   }
 
-  public function getUserByToken() {
+  public function getUserByToken(Request $request) {
     if ($user = Auth::user()) {
       return response()->json([
         "user" => $user

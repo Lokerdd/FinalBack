@@ -8,17 +8,13 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthHelper {
   public static function createToken() {
-    $token = Auth::user()->createToken(config('app.name'));
-    $token->accessToken->expires_at = Carbon::now()->addDay();
-    $token->accessToken->save();
+    $token = Auth::user()
+      ->createToken(config('app.name'))
+      ->accessToken;
 
     return response()->json([
       'user' => Auth::user(),
-      'token_type' => 'Bearer',
-      'token' => $token->accessToken,
-      'expires_at' => 
-        Carbon::parse($token->accessToken->expires_at)
-          ->toDateTimeString()
+      'token' => $token,
     ], Response::HTTP_OK);
   }
 }
