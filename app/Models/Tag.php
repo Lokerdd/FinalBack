@@ -14,7 +14,7 @@ class Tag extends Model
     ];
 
     protected $hidden = [
-      'pivot'
+      'pivot', 'id', 'created_at', 'updated_at'
     ];
 
     /**
