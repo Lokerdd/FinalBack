@@ -36,13 +36,13 @@ class PostController extends Controller
     $post = new Post;
 
     $post->user_id = Auth::user()->id;
-    $post->header = $request->input('header');
-    $post->description = $request->input('description');
+    $post->header = $request->header;
+    $post->description = $request->description;
 
     if ($request->hasFile('image')) {
       $post->image = $request->image
         ->storeAs(
-          'images', 
+          'images/posts', 
           date('d-m-y_H-i').'.'.$request->image->extension(),
           'root_public'
         );
@@ -50,9 +50,9 @@ class PostController extends Controller
 
     $post->save();
 
-    if ($request->input('tags')) {
+    if ($request->tags) {
       $tags = [];
-      foreach (explode(' ', $request->input('tags')) as $key) {
+      foreach (explode(' ', $request->tags) as $key) {
         if (!($tag = Tag::where('name', $key)->first())) {
           $tag = new Tag();
           $tag->name = $key;

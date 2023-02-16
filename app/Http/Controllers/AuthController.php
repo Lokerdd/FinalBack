@@ -57,7 +57,7 @@ class AuthController extends Controller
     return AuthHelper::createToken();
   }
 
-  public function logout(Request $request) {
+  public function logout() {
     Auth::user()->token()->revoke();
 
     return response()->json([
@@ -65,7 +65,7 @@ class AuthController extends Controller
     ], Response::HTTP_OK);
   }
 
-  public function getUserByToken(Request $request) {
+  public function getUserByToken() {
     if ($user = Auth::user()) {
       return response()->json([
         "user" => $user
