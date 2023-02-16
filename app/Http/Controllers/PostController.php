@@ -43,7 +43,7 @@ class PostController extends Controller
       $post->image = $request->image
         ->storeAs(
           'images', 
-          'post'.$post->id.'image.'.$request->image->extension(),
+          date('d-m-y_H-i').'.'.$request->image->extension(),
           'root_public'
         );
     }
