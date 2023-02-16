@@ -17,13 +17,12 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::controller(PostController::class)->prefix('posts')->group(function () {
+  Route::get('/', 'index');
+  Route::middleware(['auth:api'])->group(function () {
+    Route::post('/', 'store');
+  });
 });
-
-Route::resource('posts', PostController::class)->only([
-  'index'
-]);
 
 Route::controller(AuthController::class)->prefix('auth')->group(function () {
     Route::post('login', 'login');
