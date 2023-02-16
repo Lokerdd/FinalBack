@@ -15,6 +15,11 @@ class UserController extends Controller
         ->where('user_id', $user->id)
         ->orderBy('id', 'desc')
         ->get()
+        ->map(function ($item) {
+          if ($item->image)
+            $item->image = asset($item->image);
+          return $item;
+        });
       ;
       $user['posts'] = $posts;
       return $user;

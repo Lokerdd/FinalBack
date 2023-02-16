@@ -14,15 +14,20 @@ class PostController extends Controller
   public function index() {
     return Post::with(['user:id,name,email', 'tags:name'])
       ->orderBy('id', 'desc')
-      ->get();
+      ->get()
+      ->map(function ($item) {
+        if ($item->image)
+          $item->image = asset($item->image);
+        return $item;
+      });
   }
 
   public function store(Request $request) {
     $validated = Validator::make($request->all(), [
       "header" => 'required|string|max:255',
       "description" => 'required|string',
-      "tags" => 'array',
-      "article-image" => 'file|mimes:png,jpg,jpeg,svg'
+      "tags" => 'string',
+      "image" => 'file|mimes:png,jpg,jpeg,svg'
     ]);
     if ($validated->fails()) {
       return response("{ 'error': 'Not valid data' }", Response::HTTP_BAD_REQUEST);
@@ -34,11 +39,20 @@ class PostController extends Controller
     $post->header = $request->input('header');
     $post->description = $request->input('description');
 
+    if ($request->hasFile('image')) {
+      $post->image = $request->image
+        ->storeAs(
+          'images', 
+          'post'.$post->id.'image.'.$request->image->extension(),
+          'root_public'
+        );
+    }
+
     $post->save();
 
     if ($request->input('tags')) {
       $tags = [];
-      foreach ($request->input('tags') as $key) {
+      foreach (explode(' ', $request->input('tags')) as $key) {
         if (!($tag = Tag::where('name', $key)->first())) {
           $tag = new Tag();
           $tag->name = $key;
@@ -50,14 +64,7 @@ class PostController extends Controller
       $post->tags = $post->tags;
     }
 
-    if ($request->hasFile('article-image')) {
-      $post->image = $request['article-image']
-        ->storeAs(
-          'images', 
-          'post'.$post->id.'image.'.$request['article-image']->extension(),
-          'root_public'
-        );
-      $post->save();
+    if ($request->hasFile('image')) {
       $post->image = asset($post->image);
     }
 

@@ -22,8 +22,8 @@ class Tag extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function posts(): BelongsToMany
+    public function posts()
     {
-        return $this->belongsToMany(Post::class, 'posts_tags');
+        return $this->belongsToMany(Post::class);
     }
 }
