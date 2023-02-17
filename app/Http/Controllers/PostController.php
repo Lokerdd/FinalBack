@@ -9,6 +9,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
+use Constants\ValidationSchemas;
+
 class PostController extends Controller
 {
   public function index() {
@@ -23,14 +25,11 @@ class PostController extends Controller
   }
 
   public function store(Request $request) {
-    $validated = Validator::make($request->all(), [
-      "header" => 'required|string|max:255',
-      "description" => 'required|string',
-      "tags" => 'string',
-      "image" => 'file|mimes:png,jpg,jpeg,svg'
-    ]);
+    $validated = Validator::make($request->all(), ValidationSchemas::storePost);
     if ($validated->fails()) {
-      return response("{ 'error': 'Not valid data' }", Response::HTTP_BAD_REQUEST);
+      return response()->json([
+        'message' => 'Not valid data'
+      ], Response::HTTP_BAD_REQUEST);
     }
 
     $post = new Post;

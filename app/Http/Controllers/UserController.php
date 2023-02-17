@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
+use Constants\ValidationSchemas;
+
 class UserController extends Controller
 {
-    public function getUser($id) {
+    public function show($id) {
       $user = User::findOrFail($id);
       $posts = Post::with(['tags:name'])
         ->where('user_id', $user->id)
@@ -28,11 +30,8 @@ class UserController extends Controller
       return $user;
     }
 
-    public function updateUser(Request $request) {
-      $validated = Validator::make($request->all(), [
-        "name" => 'string|max:255',
-        "image" => 'file|mimes:png,jpg,jpeg,svg'
-      ]);
+    public function update(Request $request) {
+      $validated = Validator::make($request->all(), ValidationSchemas::updateUser);
       if ($validated->fails()) {
         return response()->json([
           'message' => 'Not valid data'
@@ -40,7 +39,8 @@ class UserController extends Controller
           Response::HTTP_BAD_REQUEST
         );
       }
-      if (!($request->name || $request->avatar)) {
+      ['name' => $name, 'avatar' => $avatar] = $request;
+      if (!($name || $avatar)) {
         return response()->json([
           'message' => 'Nothing to change'
           ], 
@@ -49,16 +49,16 @@ class UserController extends Controller
       }
 
       $user = Auth::user();
-      if ($request->name) $user->name = $request->name;
-      if ($request->hasFile('avatar')) {
+      if ($name) $user->name = $name;
+      if ($avatar) {
         if (
           $user->avatar 
           && Storage::disk('root_public')->exists($user->avatar)
         ) Storage::disk('root_public')->delete($user->avatar);
-        $user->avatar = $request->avatar
+        $user->avatar = $avatar
           ->storeAs(
             'images/avatars',
-            $user->id.'.'.$request->avatar->extension(),
+            $user->id.'.'.$avatar->extension(),
             'root_public'
           );
       }
