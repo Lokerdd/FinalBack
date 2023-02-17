@@ -29,6 +29,9 @@ class UserController extends Controller
         });
       ;
       $user['posts'] = $posts;
+      if ($user->avatar) {
+        $user->avatar = asset($user->avatar);
+      }
       return $user;
     }
 
@@ -63,7 +66,7 @@ class UserController extends Controller
         $user->avatar = $avatar
           ->storeAs(
             'images/avatars',
-            $user->id.'.'.$avatar->extension(),
+            date('d|m|y_H:i:s').'.'.$avatar->extension(),
             'root_public'
           );
       }

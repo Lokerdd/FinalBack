@@ -68,6 +68,9 @@ class AuthController extends Controller
   public function getUserByToken() {
     $user = Auth::user();
     if ($user) {
+      if ($user->avatar) {
+        $user->avatar = asset($user->avatar);
+      }
       return response()->json([
         "user" => $user
       ], Response::HTTP_OK);
