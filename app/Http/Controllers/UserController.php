@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 use Constants\ValidationSchemas;
 
+define('storage', Storage::disk('root_public'));
+
 class UserController extends Controller
 {
     public function show($id) {
@@ -31,7 +33,10 @@ class UserController extends Controller
     }
 
     public function update(Request $request) {
-      $validated = Validator::make($request->all(), ValidationSchemas::updateUser);
+      $validated = Validator::make(
+        $request->all(), 
+        ValidationSchemas::updateUser
+      );
       if ($validated->fails()) {
         return response()->json([
           'message' => 'Not valid data'
@@ -53,8 +58,8 @@ class UserController extends Controller
       if ($avatar) {
         if (
           $user->avatar 
-          && Storage::disk('root_public')->exists($user->avatar)
-        ) Storage::disk('root_public')->delete($user->avatar);
+          && storage->exists($user->avatar)
+        ) storage->delete($user->avatar);
         $user->avatar = $avatar
           ->storeAs(
             'images/avatars',

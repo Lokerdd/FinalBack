@@ -16,7 +16,10 @@ class AuthController extends Controller
 {
   public function login(Request $request)
   {
-    $validator = Validator::make($request->all(), ValidationSchemas::login);
+    $validator = Validator::make(
+      $request->all(), 
+      ValidationSchemas::login
+    );
     if ($validator->fails()) {
       return response()->json([
         'message' => $validator->getMessageBag()
@@ -34,7 +37,10 @@ class AuthController extends Controller
 
   public function register(Request $request)
   {
-    $validator = Validator::make($request->all(), ValidationSchemas::register);
+    $validator = Validator::make(
+      $request->all(), 
+      ValidationSchemas::register
+    );
     if ($validator->fails()) {
       return response()->json([
         'message' => $validator->getMessageBag()

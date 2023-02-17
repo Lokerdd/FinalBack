@@ -25,7 +25,10 @@ class PostController extends Controller
   }
 
   public function store(Request $request) {
-    $validated = Validator::make($request->all(), ValidationSchemas::storePost);
+    $validated = Validator::make(
+      $request->all(), 
+      ValidationSchemas::storePost
+    );
     if ($validated->fails()) {
       return response()->json([
         'message' => 'Not valid data'
