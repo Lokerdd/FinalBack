@@ -10,15 +10,16 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 use Helpers\AuthHelper;
+use Constants\ValidationSchemas;
 
 class AuthController extends Controller
 {
   public function login(Request $request)
   {
-    $validator = Validator::make($request->all(), [
-      'email' => ['required', 'email', 'exists:users'],
-      'password' => ['required']
-    ]);
+    $validator = Validator::make(
+      $request->all(), 
+      ValidationSchemas::login
+    );
     if ($validator->fails()) {
       return response()->json([
         'message' => $validator->getMessageBag()
@@ -36,11 +37,10 @@ class AuthController extends Controller
 
   public function register(Request $request)
   {
-    $validator = Validator::make($request->all(), [
-      'name' => ['required', 'min:4'],
-      'email' => ['required', 'email', 'unique:users'],
-      'password' => ['required', 'min:8']
-    ]);
+    $validator = Validator::make(
+      $request->all(), 
+      ValidationSchemas::register
+    );
     if ($validator->fails()) {
       return response()->json([
         'message' => $validator->getMessageBag()
@@ -57,7 +57,7 @@ class AuthController extends Controller
     return AuthHelper::createToken();
   }
 
-  public function logout(Request $request) {
+  public function logout() {
     Auth::user()->token()->revoke();
 
     return response()->json([
@@ -65,8 +65,9 @@ class AuthController extends Controller
     ], Response::HTTP_OK);
   }
 
-  public function getUserByToken(Request $request) {
-    if ($user = Auth::user()) {
+  public function getUserByToken() {
+    $user = Auth::user();
+    if ($user) {
       return response()->json([
         "user" => $user
       ], Response::HTTP_OK);
@@ -74,6 +75,5 @@ class AuthController extends Controller
     return response()->json([
       "message" => "You aren't authorized"
     ], Response::HTTP_UNAUTHORIZED);
-
   }
 }

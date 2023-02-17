@@ -9,6 +9,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
+use Constants\ValidationSchemas;
+
 class PostController extends Controller
 {
   public function index() {
@@ -23,26 +25,26 @@ class PostController extends Controller
   }
 
   public function store(Request $request) {
-    $validated = Validator::make($request->all(), [
-      "header" => 'required|string|max:255',
-      "description" => 'required|string',
-      "tags" => 'string',
-      "image" => 'file|mimes:png,jpg,jpeg,svg'
-    ]);
+    $validated = Validator::make(
+      $request->all(), 
+      ValidationSchemas::storePost
+    );
     if ($validated->fails()) {
-      return response("{ 'error': 'Not valid data' }", Response::HTTP_BAD_REQUEST);
+      return response()->json([
+        'message' => 'Not valid data'
+      ], Response::HTTP_BAD_REQUEST);
     }
 
     $post = new Post;
 
     $post->user_id = Auth::user()->id;
-    $post->header = $request->input('header');
-    $post->description = $request->input('description');
+    $post->header = $request->header;
+    $post->description = $request->description;
 
     if ($request->hasFile('image')) {
       $post->image = $request->image
         ->storeAs(
-          'images', 
+          'images/posts', 
           date('d-m-y_H-i').'.'.$request->image->extension(),
           'root_public'
         );
@@ -50,9 +52,9 @@ class PostController extends Controller
 
     $post->save();
 
-    if ($request->input('tags')) {
+    if ($request->tags) {
       $tags = [];
-      foreach (explode(' ', $request->input('tags')) as $key) {
+      foreach (explode(' ', $request->tags) as $key) {
         if (!($tag = Tag::where('name', $key)->first())) {
           $tag = new Tag();
           $tag->name = $key;
