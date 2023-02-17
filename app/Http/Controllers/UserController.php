@@ -46,13 +46,14 @@ class UserController extends Controller
           Response::HTTP_BAD_REQUEST
         );
       }
+
       $user = Auth::user();
       if ($request->name) $user->name = $request->name;
       if ($request->hasFile('avatar')) {
         $user->avatar = $request->avatar
           ->storeAs(
             'images/avatars',
-            $user->email.date('d-m-y_H-i').'.'.$request->avatar->extension(),
+            $user->id.'.'.$request->avatar->extension(),
             'root_public'
           );
       }
