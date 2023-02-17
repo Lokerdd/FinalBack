@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    public function show($id) {
+    public function getUser($id) {
       $user = User::findOrFail($id);
       $posts = Post::with(['tags:name'])
         ->where('user_id', $user->id)
@@ -27,7 +28,7 @@ class UserController extends Controller
       return $user;
     }
 
-    public function update(Request $request) {
+    public function updateUser(Request $request) {
       $validated = Validator::make($request->all(), [
         "name" => 'string|max:255',
         "image" => 'file|mimes:png,jpg,jpeg,svg'
@@ -50,6 +51,10 @@ class UserController extends Controller
       $user = Auth::user();
       if ($request->name) $user->name = $request->name;
       if ($request->hasFile('avatar')) {
+        if (
+          $user->avatar 
+          && Storage::disk('root_public')->exists($user->avatar)
+        ) Storage::disk('root_public')->delete($user->avatar);
         $user->avatar = $request->avatar
           ->storeAs(
             'images/avatars',

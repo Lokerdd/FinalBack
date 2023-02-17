@@ -34,8 +34,8 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
 });
 
 Route::controller(UserController::class)->prefix('users')->group(function () {
-  Route::get('/{id}', 'show');
+  Route::get('/{id}', 'getUser');
   Route::middleware(['auth:api'])->group(function () {
-    Route::put('/', 'update');
+    Route::put('/', 'updateUser');
   });
 });
