@@ -37,7 +37,6 @@ class PostController extends Controller
   public function index(Request $request) {
     $searchText = $request->query('search-text');
     $filter = $request->query('filter');
-    $posts = Post::with(['user:id,name,email', 'tags:name']);
 
     $postsSortedByTags = Post::with(['user:id,name,email', 'tags:name'])
       ->whereHas('tags', 
