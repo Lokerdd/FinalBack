@@ -36,7 +36,7 @@ class PostController extends Controller
           $item->where('name', 'like' , '%'.$searchText.'%');
         }
       );
-    if ($filter === 'tags') return self::sortPosts($postsSortedByTags);
+    if ($filter === 'Tags') return self::sortPosts($postsSortedByTags);
 
     $postsSortedByAuthor = Post::with(['user:id,name,email', 'tags:name'])
       ->whereHas('user',
@@ -44,7 +44,7 @@ class PostController extends Controller
           $item->where('name', 'like' , '%'.$searchText.'%');
         }
       );
-    if ($filter === 'author') return self::sortPosts($postsSortedByAuthor);
+    if ($filter === 'Author') return self::sortPosts($postsSortedByAuthor);
 
     $result = Post::with(['user:id,name,email', 'tags:name'])
       ->where('description', 'like', '%'.$searchText.'%')
