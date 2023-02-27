@@ -14,24 +14,29 @@ use Constants\ValidationSchemas;
 
 define('TAGS', 'Tags');
 define('AUTHOR', 'Author');
+define('POSTS_ON_PAGE', 6);
 
 class PostController extends Controller
 {
   private static function sortPosts($posts) {
-    return $posts
+    $amountOfPages = ceil($posts->count() / POSTS_ON_PAGE);
+    $posts = $posts
       ->orderBy('id', 'desc')
-      ->paginate(6)
+      ->paginate(POSTS_ON_PAGE)
       ->map(function ($item) {
         if ($item->image)
           $item->image = asset($item->image);
         return $item;
       });
+    return [
+      'posts' => $posts,
+      'pages' => $amountOfPages
+    ];
   }
 
   public function index(Request $request) {
     $searchText = $request->query('search-text');
     $filter = $request->query('filter');
-    $posts = Post::with(['user:id,name,email', 'tags:name']);
 
     $postsSortedByTags = Post::with(['user:id,name,email', 'tags:name'])
       ->whereHas('tags', 
