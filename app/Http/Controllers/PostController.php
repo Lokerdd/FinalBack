@@ -17,7 +17,7 @@ class PostController extends Controller
   private static function sortPosts($posts) {
     return $posts
       ->orderBy('id', 'desc')
-      ->get()
+      ->paginate(12)
       ->map(function ($item) {
         if ($item->image)
           $item->image = asset($item->image);
