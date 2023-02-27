@@ -47,7 +47,7 @@ class UserController extends Controller
           Response::HTTP_BAD_REQUEST
         );
       }
-      ['name' => $name, 'avatar' => $avatar] = $request;
+      ['name' => $name, 'image' => $avatar] = $request;
       if (!($name || $avatar)) {
         return response()->json([
           'message' => 'Nothing to change'
