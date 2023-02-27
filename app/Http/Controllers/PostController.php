@@ -12,12 +12,15 @@ use Illuminate\Database\Eloquent\Builder;
 
 use Constants\ValidationSchemas;
 
+define('TAGS', 'Tags');
+define('AUTHOR', 'Author');
+
 class PostController extends Controller
 {
   private static function sortPosts($posts) {
     return $posts
       ->orderBy('id', 'desc')
-      ->paginate(12)
+      ->paginate(6)
       ->map(function ($item) {
         if ($item->image)
           $item->image = asset($item->image);
@@ -36,7 +39,7 @@ class PostController extends Controller
           $item->where('name', 'like' , '%'.$searchText.'%');
         }
       );
-    if ($filter === 'Tags') return self::sortPosts($postsSortedByTags);
+    if ($filter === TAGS) return self::sortPosts($postsSortedByTags);
 
     $postsSortedByAuthor = Post::with(['user:id,name,email', 'tags:name'])
       ->whereHas('user',
@@ -44,7 +47,7 @@ class PostController extends Controller
           $item->where('name', 'like' , '%'.$searchText.'%');
         }
       );
-    if ($filter === 'Author') return self::sortPosts($postsSortedByAuthor);
+    if ($filter === AUTHOR) return self::sortPosts($postsSortedByAuthor);
 
     $result = Post::with(['user:id,name,email', 'tags:name'])
       ->where('description', 'like', '%'.$searchText.'%')
