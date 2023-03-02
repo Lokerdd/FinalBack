@@ -112,6 +112,6 @@ class AuthController extends Controller
       ->createToken(config('app.name'))
       ->accessToken;
 
-    return redirect('http://localhost:3000/?token='.$token);
+    return redirect(env('GOOGLE_AUTH_CLIENT_REDIRECT_URL').$token);
   }
 }
