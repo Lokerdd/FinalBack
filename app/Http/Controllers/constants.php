@@ -17,7 +17,6 @@ class ValidationSchemas {
   public const storePost = [
     "header" => 'required|string|max:255',
     "description" => 'required|string',
-    "tags" => 'string',
     "image" => 'file|mimes:png,jpg,jpeg,svg'
   ];
 

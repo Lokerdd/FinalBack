@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 
 use Helpers\AuthHelper;
 use Constants\ValidationSchemas;
@@ -78,5 +79,39 @@ class AuthController extends Controller
     return response()->json([
       "message" => "You aren't authorized"
     ], Response::HTTP_UNAUTHORIZED);
+  }
+
+  public function redirectToGoogle() {
+    return Socialite::driver('google')->stateless()->redirect();
+  }
+
+  public function handleGoogleCallback() {
+    $googleUser = Socialite::driver('google')->stateless()->user();
+
+    $user = User::where('email', $googleUser->email)->first();
+
+    if ($user) {
+      $user->google_id = $googleUser->id;
+      if (!$user->avatar) {
+        $user->avatar = $googleUser->avatar;
+      }
+    } else {
+      $user = User::create([
+        'email' => $googleUser->email,
+        'google_id' => $googleUser->id,
+        'name' => $googleUser->nickname,
+        'avatar' => $googleUser->getAvatar(),
+        'password' => bcrypt('someCoolPassword12345'),
+      ]);
+    }
+
+    $user->save();
+    Auth::login($user);
+    
+    $token = Auth::user()
+      ->createToken(config('app.name'))
+      ->accessToken;
+
+    return redirect('http://localhost:3000/?token='.$token);
   }
 }
