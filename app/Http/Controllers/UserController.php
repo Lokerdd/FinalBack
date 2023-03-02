@@ -54,9 +54,12 @@ class UserController extends Controller
     if ($filter === TAGS) return self::sortPosts($user, $postsSortedByTags);
 
     $posts = Post::with(['tags:name'])
-      ->where('description', 'like', '%'.$searchText.'%')
-      ->orWhere('header', 'like', '%'.$searchText.'%')
       ->where('user_id', $id)
+      ->where(function (Builder $query) use ($searchText) {
+        $query
+          ->where('description', 'like', '%'.$searchText.'%')
+          ->orWhere('header', 'like', '%'.$searchText.'%');
+      })
       ->union($postsSortedByTags);
 
     return self::sortPosts($user, $posts);
