@@ -100,7 +100,7 @@ class AuthController extends Controller
         'email' => $googleUser->email,
         'google_id' => $googleUser->id,
         'name' => $googleUser->nickname,
-        'avatar' => $googleUser->getAvatar(),
+        'avatar' => $googleUser->avatar,
         'password' => bcrypt('someCoolPassword12345'),
       ]);
     }
